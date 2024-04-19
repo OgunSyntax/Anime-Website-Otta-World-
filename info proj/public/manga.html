@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manga page</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+</head>
+<body>
+    <div class="header">
+        <nav class="nav">
+            <div class="nav-logo">
+                <p>Otta World</p>
+            </div>
+            <div class="nav-menu" id="navMenu">
+              <ul>
+                <li><a href="index.html" class="link">Home</a></li>
+                <li><a href="anime.html" class="link">Anime series</a></li>
+                <li><a href="manga.html" class="link">Manga</a></li>
+                <li><a href="About-us.html" class="link">About</a></li>
+              </ul>
+            </div>
+            <div class="nav-button">
+                <button class="btn white-btn" id="loginBtn" onclick="login()">Login</button>
+            </div>
+            
+              <div class="nav-menu-btn" onclick="myMenuFunction()">
+              <div class="hamburger"></div>
+              <div class="hamburger"></div>
+              <div class="hamburger"></div>
+            </div>
+        </nav>
+    </div>
+    <div>
+        <input id='s' type='search'>
+    </div>
+
+    <div class="card-holder">   
+        <!-- Card elements will be dynamically added here -->
+    </div>
+
+   
+  <!-- Modal HTML structure -->
+  <div id="myModal" class="modal">
+      <div class="modal-content">
+
+          <div class="images">      
+              <img src="" id="modal-image" alt="">
+              <div class="erhonder">
+              <div class="ranknum"> 
+                  <p>Rank:</p> <div id="modal-rank"></div>  
+              </div>
+
+              <div class="genwords">
+                  <p>Genre:</p><div id="modal-genre"></div>
+              </div>     
+            </div> 
+
+          </div>
+
+          <div class="descrip">
+              <h2 id="modal-title"></h2>
+              <p id="modal-synopsis"></p>
+          </div>   
+          <span class="close">&times;</span>
+      </div>
+  </div>
+  <!-----------------------------------------------------------------------------------  -->
+    
+    <button></button>
+
+    <script>
+          function truncateText(text, maxLength) {
+              if (text.length <= maxLength) {
+                  return text; // No truncation needed if text is already shorter
+              }
+              return text.substring(0, maxLength) + "..."; // Truncate to maxLength and add ellipsis
+          }
+
+          async function drawCard(records){
+              let html = '';
+              let results = document.querySelector('.card-holder');
+
+              for(let rec of records) {
+                  const synopsis = rec.synopsis;
+                  const maxLength = 200;
+                  const truncatedSynopsis = synopsis ? truncateText(synopsis, maxLength) : 'No synopsis available.';
+                  const uniqueButtonId = `myBtn-${rec.mal_id}`;
+
+                  html += `
+                      <div class="card">
+                          <img src="${rec.images.jpg.large_image_url}" alt="${rec.title}">
+                          <div class="card-content">
+                              <h2>${rec.title}</h2>
+                              <p>${truncatedSynopsis}</p>
+                              <button id="${uniqueButtonId}" class="modal-btn">
+                                  Find out more 
+                                  <span class="material-symbols-outlined">
+                                      arrow_right_alt
+                                  </span>
+                              </button>
+                          </div>
+                      </div>
+                  `;
+
+                  // Store genre for each record to be used in modal
+                  rec.genre = rec.genres.map(genre => genre.name).join(', ');
+              }
+              results.innerHTML = html;
+
+            // Event listener for modal buttons
+            document.addEventListener('click', function(event) {
+                if (event.target.matches('.modal-btn')) {
+                    const modalId = event.target.id.replace('myBtn-', '');
+                    const modal = document.getElementById('myModal');
+                    const modalImage = modal.querySelector('#modal-image');
+                    const modalTitle = modal.querySelector('#modal-title');
+                    const modalSynopsis = modal.querySelector('#modal-synopsis');
+                    const modalRank = modal.querySelector('#modal-rank');
+                    const modalGenres = modal.querySelector('#modal-genre');
+
+                    const selectedRecord = records.find(rec => rec.mal_id === parseInt(modalId));
+
+                    modalImage.src = selectedRecord.images.jpg.large_image_url;
+                    modalTitle.textContent = selectedRecord.title;
+                    modalSynopsis.textContent = selectedRecord.synopsis;
+                    modalRank.textContent = selectedRecord.rank;
+
+                    // Clear previous genres
+                    modalGenres.innerHTML = '';
+
+                    // Add genres
+                    selectedRecord.genres.forEach(genre => {
+                        const genreSpan = document.createElement('span');
+                        genreSpan.textContent = genre.name + ', ';
+                        modalGenres.appendChild(genreSpan);
+                    });
+
+                  const buttonContent = `
+                      Find out more 
+                      <span class="material-symbols-outlined">
+                          arrow_right_alt
+                      </span>
+                  `;
+
+                  
+                    // Remove the last comma
+                    if (modalGenres.childNodes.length > 0) {
+                        modalGenres.lastChild.textContent = modalGenres.lastChild.textContent.slice(0, -2);
+                    }
+
+                    modal.style.display = 'block'; // Make the modal visible
+                }
+            });
+
+            // Event listener for close button
+            const closeBtn = document.querySelector('.close');
+            closeBtn.addEventListener('click', () => {
+                const modal = document.getElementById('myModal');
+                modal.style.display = 'none'; // Hide the modal
+            });
+
+          }
+      //--------------------------------------------------------
+
+      async function getData(pageNumber, searchQuery = '') {
+          let apiUrl = `https://api.jikan.moe/v4/manga?page=${pageNumber}`;
+          if (searchQuery) {
+              apiUrl += `&q=${encodeURIComponent(searchQuery)}`;
+          }
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+          drawCard(data.data);
+      } 
+
+
+      // search
+      //-----------------------------------------------------
+      document.getElementById('s').addEventListener('input', function() {
+          const searchQuery = this.value.trim();
+          getData(1, searchQuery); // Call getData with page number 1 and the search query
+      });
+      //----------------------------------------------------
+
+        // Call getData for the initial page
+        // getData(1);
+
+        function myMenuFunction() {
+            var i = document.getElementById("navMenu");
+            if(i.className === "nav-menu") {
+                i.className += " responsive";
+            } else {
+                i.className = "nav-menu";
+            }
+        }
+
+
+            // pagenation
+       //---------------------------------------------------------------------------------------
+      const pageNumbers = (total, max, current) => {
+        const half = Math.floor(max / 2);
+        let to = max;
+
+        if (current + half >= total) {
+          to = total;
+        } else if (current > half) {
+          to = current + half;
+        }
+
+        let from = Math.max(to - max, 0);
+
+        return Array.from({ length: Math.min(total, max) }, (_, i) => i + 1 + from);
+      };
+
+      function PaginationButton(totalPages, maxPagesVisible = 1066, currentPage = 1) {
+        let pages = pageNumbers(totalPages, maxPagesVisible, currentPage);
+        let currentPageBtn = null;
+        const buttons = new Map();
+        const disabled = {
+          start: () => pages[0] === 1,
+          prev: () => currentPage === 1 || currentPage > totalPages,
+          end: () => pages.slice(-1)[0] === totalPages,
+          next: () => currentPage >= totalPages
+        };
+        const frag = document.createDocumentFragment();
+        const paginationButtonContainer = document.createElement("div");
+        paginationButtonContainer.className = "pagination-buttons";
+
+        const createAndSetupButton = (
+          label = "",
+          cls = "",
+          disabled = false,
+          handleClick
+        ) => {
+          const buttonElement = document.createElement("button");
+          buttonElement.textContent = label;
+          buttonElement.className = `page-btn ${cls}`;
+          buttonElement.disabled = disabled;
+          buttonElement.addEventListener("click", (e) => {
+            handleClick(e);
+            this.update();
+            paginationButtonContainer.value = currentPage;
+            paginationButtonContainer.dispatchEvent(
+              new CustomEvent("change", { detail: { currentPageBtn } })
+            );
+            getData(currentPage);
+          });
+
+          return buttonElement;
+        };
+
+        const onPageButtonClick = (e) =>
+          (currentPage = Number(e.currentTarget.textContent));
+
+        const onPageButtonUpdate = (index) => (btn) => {
+          btn.textContent = pages[index];
+
+          if (pages[index] === currentPage) {
+            currentPageBtn.classList.remove("active");
+            btn.classList.add("active");
+            currentPageBtn = btn;
+            currentPageBtn.focus();
+          }
+        };
+
+        buttons.set(
+          createAndSetupButton(
+            "start",
+            "start-page",
+            disabled.start(),
+            () => (currentPage = 1)
+          ),
+          (btn) => (btn.disabled = disabled.start())
+        );
+
+        buttons.set(
+          createAndSetupButton(
+            "prev",
+            "prev-page",
+            disabled.prev(),
+            () => (currentPage -= 1)
+          ),
+          (btn) => (btn.disabled = disabled.prev())
+        );
+
+        pages.map((pageNumber, index) => {
+          const isCurrentPage = currentPage === pageNumber;
+          const button = createAndSetupButton(
+            pageNumber,
+            isCurrentPage ? "active" : "",
+            false,
+            onPageButtonClick
+          );
+
+          if (isCurrentPage) {
+            currentPageBtn = button;
+          }
+
+          buttons.set(button, onPageButtonUpdate(index));
+        });
+
+        buttons.set(
+          createAndSetupButton(
+            "next",
+            "next-page",
+            disabled.next(),
+            () => (currentPage += 1)
+          ),
+          (btn) => (btn.disabled = disabled.next())
+        );
+
+        buttons.set(
+          createAndSetupButton(
+            "end",
+            "end-page",
+            disabled.end(),
+            () => (currentPage = totalPages)
+          ),
+          (btn) => (btn.disabled = disabled.end())
+        );
+
+        buttons.forEach((_, btn) => frag.appendChild(btn));
+        paginationButtonContainer.appendChild(frag);
+
+        this.render = (container = document.body) => {
+          container.appendChild(paginationButtonContainer);
+        };
+
+        this.update = (newPageNumber = currentPage) => {
+          currentPage = newPageNumber;
+          pages = pageNumbers(totalPages, maxPagesVisible, currentPage);
+          buttons.forEach((updateButton, btn) => updateButton(btn));
+        };
+
+        this.onChange = (handler) => {
+          paginationButtonContainer.addEventListener("change", handler);
+        };
+      }
+
+      const paginationButtons = new PaginationButton(1066, 5);
+
+      paginationButtons.render();
+
+      paginationButtons.onChange((e) => {
+        console.log("-- changed", e.target.value);
+      });
+
+      getData(1);
+
+      
+ //----------------------------------------------------------------------------------------
+    </script>
+</body>
+</html>

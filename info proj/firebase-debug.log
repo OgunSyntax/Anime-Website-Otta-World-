@@ -1,0 +1,19 @@
+[debug] [2024-04-19T03:08:08.636Z] ----------------------------------------------------------------------
+[debug] [2024-04-19T03:08:08.657Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Barry\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js hosting:disable
+[debug] [2024-04-19T03:08:08.660Z] CLI Version:   13.7.3
+[debug] [2024-04-19T03:08:08.661Z] Platform:      win32
+[debug] [2024-04-19T03:08:08.662Z] Node Version:  v18.17.1
+[debug] [2024-04-19T03:08:08.666Z] Time:          Fri Apr 19 2024 00:08:08 GMT-0300 (Atlantic Daylight Time)
+[debug] [2024-04-19T03:08:08.669Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-04-19T03:08:09.378Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-04-19T03:08:09.380Z] > authorizing via signed-in user (jaysencbarry@gmail.com)
+[debug] [2024-04-19T03:08:09.381Z] [iam] checking project otttaworld for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2024-04-19T03:08:09.396Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/otttaworld:testIamPermissions [none]
+[debug] [2024-04-19T03:08:09.402Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/otttaworld:testIamPermissions x-goog-quota-user=projects/otttaworld
+[debug] [2024-04-19T03:08:09.403Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/otttaworld:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-04-19T03:08:10.560Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/otttaworld:testIamPermissions 200
+[debug] [2024-04-19T03:08:10.561Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/otttaworld:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2024-04-19T03:08:10.607Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/otttaworld [none]
+[debug] [2024-04-19T03:08:12.295Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/otttaworld 200
+[debug] [2024-04-19T03:08:12.300Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/otttaworld {"projectId":"otttaworld","projectNumber":"185458744637","displayName":"OttaWorld","name":"projects/otttaworld","resources":{"hostingSite":"otttaworld"},"state":"ACTIVE","etag":"1_87d8ea5d-2e7f-4355-9951-f1da84e76f38"}
